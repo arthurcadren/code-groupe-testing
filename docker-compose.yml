@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/propelize
+      - JWT_SECRET=your_jwt_secret_key
+      - JWT_REFRESH_SECRET=your_jwt_refresh_secret_key
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - api
+    command: npm run dev
+
+volumes:
+  mongo-data:
