@@ -27,4 +27,17 @@ router.delete('/:id', async (req, res) => {
   res.status(204).end();
 });
 
+// GET by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findById(req.params.id);
+    if (!vehicle) {
+      return res.status(404).json({ error: 'Véhicule non trouvé' });
+    }
+    res.json(vehicle);
+  } catch (err) {
+    res.status(400).json({ error: 'ID invalide' });
+  }
+});
+
 module.exports = router;
