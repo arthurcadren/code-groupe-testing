@@ -1,0 +1,18 @@
+name: CI Pipeline
+on:
+  push:
+    branches: [Joel-Austin]    
+  pull_request:
+    branches: [Joel-Austin] 
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      # - name: Verify linting  # Décommente si tu utilises ESLint
