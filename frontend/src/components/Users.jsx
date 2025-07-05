@@ -10,7 +10,7 @@ function Users() {
   useEffect(() => {
     const fetchUsers = async () => {
       const token = localStorage.getItem('accessToken');
-      const res = await axios.get('http://localhost:3000/api/users', {
+      const res = await axios.get('http://localhost:4000/api/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(res.data);

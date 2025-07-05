@@ -7,7 +7,7 @@ function Vehicles() {
   useEffect(() => {
     const fetchVehicles = async () => {
       const token = localStorage.getItem('accessToken');
-      const res = await axios.get('http://localhost:3000/api/vehicles', {
+      const res = await axios.get('http://localhost:4000/api/vehicles', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setVehicles(res.data);

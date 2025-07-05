@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Vehicle = require('../models/Vehicle');
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 
 
 const seedVehicles = async () => {
@@ -16,8 +17,18 @@ const seedVehicles = async () => {
 const seedUsers = async () => {
   await User.deleteMany({});
   await User.create([
-    { username: 'admin', password: 'admin123', email: 'admin@propelize.com', role: 'admin' },
-    { username: 'user', password: 'user123', email: 'user@propelize.com', role: 'user' }
+    {
+      username: 'admin',
+      password: await bcrypt.hash('admin123', 10),
+      email: 'admin@propelize.com',
+      role: 'admin'
+    },
+    {
+      username: 'user',
+      password: await bcrypt.hash('user123', 10),
+      email: 'user@propelize.com',
+      role: 'user'
+    }
   ]);
   console.log('Utilisateurs initialisés.');
 };

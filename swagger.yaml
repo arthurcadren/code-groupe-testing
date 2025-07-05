@@ -1,0 +1,269 @@
+openapi: 3.0.0
+info:
+  title: Propelize API
+  description: API pour la gestion des véhicules et des utilisateurs
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Serveur local
+paths:
+  /api/vehicles:
+    get:
+      summary: Lister tous les véhicules
+      tags:
+        - Véhicules
+      responses:
+        '200':
+          description: Liste des véhicules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+    post:
+      summary: Créer un nouveau véhicule
+      tags:
+        - Véhicules
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+      responses:
+        '201':
+          description: Véhicule créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Non autorisé (token manquant ou invalide)
+  /api/vehicles/{id}:
+    get:
+      summary: Obtenir un véhicule par ID
+      tags:
+        - Véhicules
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails du véhicule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '404':
+          description: Véhicule non trouvé
+    put:
+      summary: Mettre à jour un véhicule
+      tags:
+        - Véhicules
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+      responses:
+        '200':
+          description: Véhicule mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Véhicule non trouvé
+    delete:
+      summary: Supprimer un véhicule
+      tags:
+        - Véhicules
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Véhicule supprimé
+        '401':
+          description: Non autorisé
+        '404':
+          description: Véhicule non trouvé
+  /api/auth/register:
+    post:
+      summary: Créer un nouvel utilisateur
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: Utilisateur créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Erreur de validation
+  /api/auth/login:
+    post:
+      summary: Connexion d'un utilisateur
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                  type: string
+        '401':
+          description: Identifiants invalides
+  /api/auth/refresh-token:
+    post:
+      summary: Renouveler un token d'accès
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+              required:
+                - refreshToken
+      responses:
+        '200':
+          description: Nouveau token d'accès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Token invalide
+  /api/auth/users:
+    get:
+      summary: Lister tous les utilisateurs (admin uniquement)
+      tags:
+        - Authentification
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des utilisateurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Accès interdit (non-admin)
+        '401':
+          description: Non autorisé
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        _id:
+          type: string
+        registrationNumber:
+          type: string
+        make:
+          type: string
+        model:
+          type: string
+        year:
+          type: number
+        rentalPrice:
+          type: number
+      required:
+        - registrationNumber
+        - make
+        - model
+        - year
+        - rentalPrice
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: ['user', 'admin']
+    UserInput:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+      required:
+        - username
+        - password
+        - email
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
